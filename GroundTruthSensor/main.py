@@ -1,6 +1,9 @@
 import carla
 import random
 import GroundTruthSensor
+import Stages.FOV_Stage
+import Stages.Distance_Stage
+
 
 client = carla.Client('localhost', 2000)
 world = client.load_world("Town02")
@@ -35,9 +38,11 @@ for i in range(0,5):
 spectator = world.get_spectator()
 spectator.set_transform(ego_vehicle.get_transform())
 
-world.tick()
+stages = []
+stages.append(Stages.Distance_Stage.Distance_Stage)
+stages.append(Stages.FOV_Stage.FOV_Stage)
 
-groundTruthSensor = GroundTruthSensor.GroundTruthSensor(20, world, ego_vehicle, 30)
+groundTruthSensor = GroundTruthSensor.GroundTruthSensor(20, world, ego_vehicle, 30, stages)
 
 while True:
   world.tick()
