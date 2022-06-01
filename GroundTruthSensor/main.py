@@ -1,12 +1,10 @@
 import carla
-import random
 import GroundTruthSensor
-import Stages.FOV_Stage
-import Stages.Distance_Stage
-
+import Parameterizing
+import SpawnpointHandler
 
 client = carla.Client('localhost', 2000)
-world = client.load_world("Town02")
+world = client.get_world()
 
 settings = world.get_settings()
 settings.synchronous_mode = True # Enables synchronous mode
@@ -15,35 +13,32 @@ world.apply_settings(settings)
 
 traffic_manager = client.get_trafficmanager()
 traffic_manager.set_synchronous_mode(True)
+traffic_manager.set_random_device_seed(1)
 
-spawn_points = world.get_map().get_spawn_points()
 
-vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.model3')
-vehicle_blueprint.set_attribute('role_name','ego')
-print('\nEgo role_name is set')
+spawnpoint_handler = SpawnpointHandler.SpawnpointHandler(client)
+ego_vehicle = spawnpoint_handler.setup_test()
 
-spawn_point = random.choice(spawn_points)
-
-ego_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point)
-ego_vehicle.set_autopilot(True)
-
-vehicle_blueprints = world.get_blueprint_library().filter('*vehicle*')
-for i in range(0,5):
-    blueprint = random.choice(vehicle_blueprints)
-    spawn_point = random.choice(spawn_points)
-    actor = world.try_spawn_actor(blueprint, spawn_point)
-    if(actor is not None):
-        actor.set_autopilot(True)
+parameterizing = Parameterizing.Parameterizing
+stages = parameterizing.load_sensor(1)
+groundTruthSensor = GroundTruthSensor.GroundTruthSensor(world, ego_vehicle, stages)
 
 spectator = world.get_spectator()
 spectator.set_transform(ego_vehicle.get_transform())
 
-stages = []
-stages.append(Stages.Distance_Stage.Distance_Stage)
-stages.append(Stages.FOV_Stage.FOV_Stage)
+import EnvironmentPlotter
+environemnt_plotter = EnvironmentPlotter.Environment_plotter(world.get_actors(), ego_vehicle)
 
-groundTruthSensor = GroundTruthSensor.GroundTruthSensor(20, world, ego_vehicle, 30, stages)
+timestamp = 0
 
 while True:
-  world.tick()
-  groundTruthSensor.tick()
+    world.tick()
+    z = groundTruthSensor.tick()
+    environemnt_plotter.save_environment(world.get_actors(), ego_vehicle, z)
+    timestamp = timestamp + 1
+    
+    if timestamp == 5*60:
+        environemnt_plotter.plot()
+        environemnt_plotter.show_plot()
+        break
+

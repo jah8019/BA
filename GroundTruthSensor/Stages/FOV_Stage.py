@@ -3,15 +3,19 @@ import numpy as np
 
 class FOV_Stage():
 
-    def __init__(self):
-        pass    
+    fov_right_vector = None
+    fov_left_vector = None
+
+    def __init__(self, fov, distance):
+        self.fov = fov
+        self.distance = distance
     
     def check_stage(self, actor, sensor):
-        self.draw_fov(self=self, sensor=sensor)
+        self.set_fov(sensor)
         ego_location = sensor.ego_vehilce.get_location()
         actor_location = actor.get_location()
-        first_vector = [(sensor.fov_right_vector.x - ego_location.x), (sensor.fov_left_vector.x - ego_location.x)]
-        second_vector = [(sensor.fov_right_vector.y - ego_location.y), (sensor.fov_left_vector.y - ego_location.y)]
+        first_vector = [(self.fov_right_vector.x - ego_location.x), (self.fov_left_vector.x - ego_location.x)]
+        second_vector = [(self.fov_right_vector.y - ego_location.y), (self.fov_left_vector.y - ego_location.y)]
         a = np.array([first_vector, second_vector])
         third_vector = [(actor_location.x - ego_location.x), (actor_location.y - ego_location.y)]
         b = np.array(third_vector)
@@ -23,12 +27,19 @@ class FOV_Stage():
         else:
             return True
 
-    def draw_fov(self, sensor):
+    def set_fov(self, sensor):
         ego_transform = sensor.ego_vehilce.get_transform()
         ego_location = sensor.ego_vehilce.get_location()
-        sensor.fov_right_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=sensor.fov/2, distance=sensor.distance, sensor=sensor)
-        sensor.fov_left_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=-sensor.fov/2, distance=sensor.distance, sensor=sensor)
-        self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=0, distance=sensor.distance, sensor=sensor)
+        self.fov_right_vector = self.draw_line_with_rotation(ego_transform, ego_location, self.fov/2, self.distance, sensor)
+        self.fov_left_vector = self.draw_line_with_rotation(ego_transform, ego_location, -self.fov/2, self.distance, sensor)
+
+
+    # def draw_fov(self, sensor):
+    #     ego_transform = sensor.ego_vehilce.get_transform()
+    #     ego_location = sensor.ego_vehilce.get_location()
+    #     sensor.fov_right_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=sensor.fov/2, distance=sensor.distance, sensor=sensor)
+    #     sensor.fov_left_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=-sensor.fov/2, distance=sensor.distance, sensor=sensor)
+    #     self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=0, distance=sensor.distance, sensor=sensor)
 
     
     def draw_line_with_rotation(self, ego_transform, ego_location, rotation, distance, sensor):
