@@ -15,30 +15,35 @@ traffic_manager = client.get_trafficmanager()
 traffic_manager.set_synchronous_mode(True)
 traffic_manager.set_random_device_seed(1)
 
-
-spawnpoint_handler = SpawnpointHandler.SpawnpointHandler(client)
-ego_vehicle = spawnpoint_handler.setup_test()
-
-parameterizing = Parameterizing.Parameterizing
-stages = parameterizing.load_sensor(1)
-groundTruthSensor = GroundTruthSensor.GroundTruthSensor(world, ego_vehicle, stages)
-
-spectator = world.get_spectator()
-spectator.set_transform(ego_vehicle.get_transform())
-
 import EnvironmentPlotter
-environemnt_plotter = EnvironmentPlotter.Environment_plotter(world.get_actors(), ego_vehicle)
+environemnt_plotter = EnvironmentPlotter.Environment_plotter(world.get_actors())
 
-timestamp = 0
+for test_id in range(1, 6):
 
-while True:
-    world.tick()
-    z = groundTruthSensor.tick()
-    environemnt_plotter.save_environment(world.get_actors(), ego_vehicle, z)
-    timestamp = timestamp + 1
+    spawnpoint_handler = SpawnpointHandler.SpawnpointHandler(client)
+    actors = spawnpoint_handler.setup_test(test_id)
+    ego_vehicle = actors[0]
+
+    parameterizing = Parameterizing.Parameterizing()
+    stages = parameterizing.load_sensor(2)
+    groundTruthSensor = GroundTruthSensor.GroundTruthSensor(world, ego_vehicle, stages)
+
+    spectator = world.get_spectator()
+    spectator.set_transform(ego_vehicle.get_transform())
+
+    timestamp = 0
+
+    while True:
+        world.tick()
+        z = groundTruthSensor.tick()
+        environemnt_plotter.save_environment(world.get_actors(), z)
+        timestamp = timestamp + 1
+        
+        if timestamp == 10*60:
+            environemnt_plotter.plot(ego_vehicle, test_id)
+            break
     
-    if timestamp == 5*60:
-        environemnt_plotter.plot()
-        environemnt_plotter.show_plot()
-        break
+    for actor in actors:
+        actor.destroy()
 
+environemnt_plotter.save_plot(test_id)
