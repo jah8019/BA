@@ -8,9 +8,11 @@ class Parameterizing():
 
     def load_sensor(self, sensor_id):
         stages = []
+        if sensor_id == 0:
+            return stages
         if sensor_id == 1:
-            stages.append(Stages.Distance_Stage.Distance_Stage(30))
+            stages.append(Stages.Distance_Stage.Distance_Stage(100))
         if sensor_id == 2:
-            stages.append(Stages.Distance_Stage.Distance_Stage(30))
-            stages.append(Stages.FOV_Stage.FOV_Stage(80, 30))
+            stages.append(Stages.Distance_Stage.Distance_Stage(100))
+            stages.append(Stages.FOV_Stage.FOV_Stage(133, 100))
         return stages 
