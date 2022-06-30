@@ -1,14 +1,20 @@
-import carla
 import numpy as np
+import sys
+import math
+sys.path.append('../')
+import Model.Rotation as r
+import Model.Location as l
+
 
 class FOV_Stage():
 
     fov_right_vector = None
     fov_left_vector = None
 
-    def __init__(self, fov, distance):
+    def __init__(self, fov, distance, debug_adapter):
         self.fov = fov
         self.distance = distance
+        self.debug_adapter = debug_adapter
     
     def check_stage(self, actor, sensor):
         self.set_fov(sensor)
@@ -28,29 +34,25 @@ class FOV_Stage():
             return True
 
     def set_fov(self, sensor):
-        ego_transform = sensor.ego_vehilce.get_transform()
+        ego_rotation = sensor.ego_vehilce.get_rotation()
         ego_location = sensor.ego_vehilce.get_location()
-        self.fov_right_vector = self.draw_line_with_rotation(ego_transform, ego_location, self.fov/2, self.distance, sensor)
-        self.fov_left_vector = self.draw_line_with_rotation(ego_transform, ego_location, -self.fov/2, self.distance, sensor)
-
-
-    # def draw_fov(self, sensor):
-    #     ego_transform = sensor.ego_vehilce.get_transform()
-    #     ego_location = sensor.ego_vehilce.get_location()
-    #     sensor.fov_right_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=sensor.fov/2, distance=sensor.distance, sensor=sensor)
-    #     sensor.fov_left_vector = self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=-sensor.fov/2, distance=sensor.distance, sensor=sensor)
-    #     self.draw_line_with_rotation(self=self, ego_transform=ego_transform, ego_location=ego_location, rotation=0, distance=sensor.distance, sensor=sensor)
-
+        self.fov_right_vector = self.draw_line_with_rotation(ego_rotation, ego_location, self.fov/2, self.distance, sensor)
+        self.fov_left_vector = self.draw_line_with_rotation(ego_rotation, ego_location, -self.fov/2, self.distance, sensor)
     
-    def draw_line_with_rotation(self, ego_transform, ego_location, rotation, distance, sensor):
-        ego_rotation = ego_transform.rotation
-        new_rotation = carla.Rotation(ego_rotation.pitch, ego_rotation.yaw, ego_rotation.roll)
+    def draw_line_with_rotation(self, ego_rotation, ego_location, rotation, distance, sensor):
+        new_rotation = r.Rotation(ego_rotation.pitch, ego_rotation.yaw, ego_rotation.roll)
         new_rotation.yaw += rotation
-        new_transform = carla.Transform(ego_location, new_rotation)
-        new_vector = new_transform.get_forward_vector()
-        new_vector.x = new_vector.x * distance
-        new_vector.y = new_vector.y * distance
-        new_vector.z = new_vector.z * distance
-        end_location = carla.Location(ego_location.x + new_vector.x, ego_location.y + new_vector.y, ego_location.z + new_vector.z)
-        sensor.world.debug.draw_line(ego_location, end_location, life_time=0.1)
+        new_vector = self.get_forward_vector(new_rotation)
+        x = new_vector[0] * distance
+        y = new_vector[1] * distance
+        z = new_vector[2] * distance
+        end_location = l.Location(ego_location.x + x, ego_location.y + y, ego_location.z + z)
+        self.debug_adapter.draw_line(ego_location, end_location, life_time=0.1)
         return end_location
+
+    def get_forward_vector(self, rotation):
+        cp = math.cos(math.radians(rotation.pitch))
+        sp = math.sin(math.radians(rotation.pitch))
+        cy = math.cos(math.radians(rotation.yaw))
+        sy = math.sin(math.radians(rotation.yaw))
+        return [cy * cp, sy * cp, sp]

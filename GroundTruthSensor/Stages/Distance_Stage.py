@@ -17,6 +17,8 @@ class Distance_Stage():
         actors_location = actor.get_location()
         ego_location = sensor.ego_vehilce.get_location() 
         distance_to_vehicle = self.get_euklidian_distance(ego_location, actors_location)
+        actor.distance = distance_to_vehicle
+        actor.distance_set = True
         if distance_to_vehicle <= self.distance:
             return True
         else:

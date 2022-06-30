@@ -1,50 +1,52 @@
-import carla
-import GroundTruthSensor
-import Parameterizing
-import SpawnpointHandler
+import time
+import GroundTruthSensor as sensor
+import Parameterizing as pm
+import SpawnpointHandler as sh
+import CarlaAdapter as ca
 
-town_name = 'Town_10'
-client = carla.Client('localhost', 2000)
-world = client.get_world()
+town_name = 'Town10'
+ego_vehicle_id = 0
+input_adapter = ca.Carla_Adapter()
 
-settings = world.get_settings()
-settings.synchronous_mode = True # Enables synchronous mode
-settings.fixed_delta_seconds = 0.05
-world.apply_settings(settings)
+for sensor_id in range(4, 5):
+    import EnvironmentPlotter as ep       
+    environemnt_plotter = ep.Environment_plotter(input_adapter.get_actors())
+    for test_id in range(1, 4):
 
-traffic_manager = client.get_trafficmanager()
-traffic_manager.set_synchronous_mode(True)
-traffic_manager.set_random_device_seed(2)
+        spawnpoint_handler = sh.SpawnpointHandler(input_adapter)
+        actors = spawnpoint_handler.setup_test(town_name, test_id)
+        ego_vehicle_id = spawnpoint_handler.ego_vehicle_id
+        ego_vehicle = actors[0]
 
-import EnvironmentPlotter       
-environemnt_plotter = EnvironmentPlotter.Environment_plotter(world.get_actors())
+        parameterizing = pm.Parameterizing(input_adapter)
+        stages = parameterizing.load_sensor(sensor_id)
+        ground_truth_sensor = sensor.GroundTruthSensor(ego_vehicle, stages)
 
-for test_id in range(1, 3):
+        timestamp = 0
+        global_start_time = time.time()
+        f = open("Sensor_" + str(sensor_id) + "Test_" + str(test_id) + "_times.txt", "a", buffering=1)
+        f.write("Sensor_" + str(sensor_id) + "Test_" + str(test_id) + "_times\n")
+        while True:
+            start_time = time.time()
+            input_adapter.tick()
+            ground_truth_actors = input_adapter.get_actors() 
+            ego_vehicle = input_adapter.get_actor(ego_vehicle_id)
+            ground_truth_sensor.ego_vehilce = ego_vehicle
+            z = ground_truth_sensor.tick(ground_truth_actors)
+            input_adapter.handle_dedection(z, ego_vehicle)
+            environemnt_plotter.save_environment(input_adapter.get_actors(), z)
+            timestamp = timestamp + 1
+            end_time = time.time()
+            time_elapsed = end_time-start_time
+            f.write(str(timestamp)+ ";" + str(time_elapsed) + "\n")
+            if timestamp == 10*60:
+                f.write("General:" + str(time.time() - global_start_time))
+                f.close()
+                environemnt_plotter.plot(ego_vehicle, test_id, sensor_id)
+                
+                break
+        ground_truth_sensor.close()
+        input_adapter.clean_up(actors)
+            
 
-    spawnpoint_handler = SpawnpointHandler.SpawnpointHandler(client)
-    actors = spawnpoint_handler.setup_test(town_name, test_id)
-    ego_vehicle = actors[0]
-
-    parameterizing = Parameterizing.Parameterizing()
-    stages = parameterizing.load_sensor(0)
-    groundTruthSensor = GroundTruthSensor.GroundTruthSensor(world, ego_vehicle, stages)
-
-    spectator = world.get_spectator()
-    spectator.set_transform(ego_vehicle.get_transform())
-
-    timestamp = 0
-
-    while True:
-        world.tick()
-        z = groundTruthSensor.tick()
-        environemnt_plotter.save_environment(world.get_actors(), z)
-        timestamp = timestamp + 1
-        
-        if timestamp == 10*60:
-            environemnt_plotter.plot(ego_vehicle, test_id)
-            break
-    
-    for actor in actors:
-        actor.destroy()
-
-environemnt_plotter.save_plot(test_id)
+    environemnt_plotter.save_plot(test_id, sensor_id)

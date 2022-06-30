@@ -2,8 +2,10 @@ import carla
 
 class SpawnpointHandler():
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, input_adapter):
+        self.client = input_adapter.client
+        self.input_adapter = input_adapter
+        self.ego_vehicle_id = 0
 
     def draw_spawn_points(self):
         world = self.client.get_world() #load_world('Town02')
@@ -70,20 +72,19 @@ class SpawnpointHandler():
                 actors.append(third_vehicle)
 
         else:
-            vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.model3')
-            spawn_point_1 =  spawn_points[72]
-            ego_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_1)
-            traffic_manager.ignore_lights_percentage(ego_vehicle, 100)
-            actors.append(ego_vehicle)
-
             if test_id == 1:
+                vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.model3')
+                spawn_point_1 =  spawn_points[81]
+                ego_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_1)
+                traffic_manager.ignore_lights_percentage(ego_vehicle, 100)
+                actors.append(ego_vehicle)
                 # Route 2
-                spawn_point_2 =  spawn_points[151]
+                spawn_point_2 =  spawn_points[147]
                 # Create route 2 from the chosen spawn points
                 route_2 = []
-                route_2.append(spawn_points[148].location)
-                route_2.append(spawn_points[74].location)
-                route_2.append(spawn_points[81].location)
+                route_2.append(spawn_points[72].location)
+                route_2.append(spawn_points[153].location)
+                route_2.append(spawn_points[146].location)
                 route_2.append(spawn_points[121].location)
                 vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.cybertruck')
                 second_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_2)
@@ -93,11 +94,18 @@ class SpawnpointHandler():
                 actors.append(second_vehicle)
 
             if test_id == 2:
+                vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.model3')
+                spawn_point_1 =  spawn_points[81]
+                ego_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_1)
+                traffic_manager.ignore_lights_percentage(ego_vehicle, 100)
+                actors.append(ego_vehicle)
                 # Route 3
-                spawn_point_3 =  spawn_points[4]
+                spawn_point_3 =  spawn_points[115]
                 # Create route 3 from the chosen spawn points
                 route_3 = []
-                route_3.append(spawn_points[150].location)
+                route_3.append(spawn_points[140].location)
+                route_3.append(spawn_points[123].location)
+                route_3.append(spawn_points[61].location)
                 vehicle_blueprint = world.get_blueprint_library().find('vehicle.volkswagen.t2')
                 third_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_3)
                 third_vehicle.set_autopilot(True)
@@ -105,11 +113,19 @@ class SpawnpointHandler():
                 actors.append(third_vehicle)
 
             if test_id == 3:
+                vehicle_blueprint = world.get_blueprint_library().find('vehicle.tesla.model3')
+                spawn_point_1 =  spawn_points[81]
+                ego_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_1)
+                traffic_manager.ignore_lights_percentage(ego_vehicle, 100)
+                actors.append(ego_vehicle)
                 # Route 4
-                spawn_point_4 =  spawn_points[93]
+                spawn_point_4 =  spawn_points[115]
                 # Create route 4 from the chosen spawn points
                 route_4 = []
-                route_4.append(spawn_points[58].location)
+                route_4.append(spawn_points[140].location)
+                route_4.append(spawn_points[10].location)
+                route_4.append(spawn_points[71].location)
+                route_4.append(spawn_points[143].location)
                 vehicle_blueprint = world.get_blueprint_library().find('vehicle.audi.etron')
                 fourth_vehicle = world.spawn_actor(vehicle_blueprint, spawn_point_4)
                 fourth_vehicle.set_autopilot(True)
@@ -140,5 +156,9 @@ class SpawnpointHandler():
                 traffic_manager.set_path(sixth_vehicle, route_6)
                 actors.append(sixth_vehicle)
 
-        return actors
+        self.ego_vehicle_id = ego_vehicle.id
+        generic_actors = []
+        for actor in actors:
+            generic_actors.append(self.input_adapter.get_object(actor))
+        return generic_actors
 
