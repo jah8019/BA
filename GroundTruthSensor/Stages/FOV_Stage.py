@@ -16,9 +16,10 @@ class FOV_Stage():
         self.distance = distance
         self.debug_adapter = debug_adapter
     
-    def check_stage(self, actor, sensor):
-        self.set_fov(sensor)
-        ego_location = sensor.ego_vehilce.get_location()
+    def check_stage(self, actor, ego_vehicle):
+        ego_location = ego_vehicle.get_location()
+        self.set_fov(ego_vehicle)
+        ego_location = ego_vehicle.get_location()
         actor_location = actor.get_location()
         first_vector = [(self.fov_right_vector.x - ego_location.x), (self.fov_left_vector.x - ego_location.x)]
         second_vector = [(self.fov_right_vector.y - ego_location.y), (self.fov_left_vector.y - ego_location.y)]
@@ -33,13 +34,13 @@ class FOV_Stage():
         else:
             return True
 
-    def set_fov(self, sensor):
-        ego_rotation = sensor.ego_vehilce.get_rotation()
-        ego_location = sensor.ego_vehilce.get_location()
-        self.fov_right_vector = self.draw_line_with_rotation(ego_rotation, ego_location, self.fov/2, self.distance, sensor)
-        self.fov_left_vector = self.draw_line_with_rotation(ego_rotation, ego_location, -self.fov/2, self.distance, sensor)
+    def set_fov(self, ego_vehicle):
+        ego_rotation = ego_vehicle.get_rotation()
+        ego_location = ego_vehicle.get_location()
+        self.fov_right_vector = self.draw_line_with_rotation(ego_rotation, ego_location, self.fov/2, self.distance)
+        self.fov_left_vector = self.draw_line_with_rotation(ego_rotation, ego_location, -self.fov/2, self.distance)
     
-    def draw_line_with_rotation(self, ego_rotation, ego_location, rotation, distance, sensor):
+    def draw_line_with_rotation(self, ego_rotation, ego_location, rotation, distance):
         new_rotation = r.Rotation(ego_rotation.pitch, ego_rotation.yaw, ego_rotation.roll)
         new_rotation.yaw += rotation
         new_vector = self.get_forward_vector(new_rotation)

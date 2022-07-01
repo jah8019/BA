@@ -13,9 +13,9 @@ class Distance_Stage():
         distance_to_vehicle = math.sqrt(value)
         return distance_to_vehicle
 
-    def check_stage(self, actor, sensor):
+    def check_stage(self, actor, ego_vehicle):
         actors_location = actor.get_location()
-        ego_location = sensor.ego_vehilce.get_location() 
+        ego_location = ego_vehicle.get_location() 
         distance_to_vehicle = self.get_euklidian_distance(ego_location, actors_location)
         actor.distance = distance_to_vehicle
         actor.distance_set = True

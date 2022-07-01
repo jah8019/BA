@@ -8,7 +8,7 @@ town_name = 'Town10'
 ego_vehicle_id = 0
 input_adapter = ca.Carla_Adapter()
 
-for sensor_id in range(4, 5):
+for sensor_id in range(2, 5):
     import EnvironmentPlotter as ep       
     environemnt_plotter = ep.Environment_plotter(input_adapter.get_actors())
     for test_id in range(1, 4):
@@ -31,8 +31,7 @@ for sensor_id in range(4, 5):
             input_adapter.tick()
             ground_truth_actors = input_adapter.get_actors() 
             ego_vehicle = input_adapter.get_actor(ego_vehicle_id)
-            ground_truth_sensor.ego_vehilce = ego_vehicle
-            z = ground_truth_sensor.tick(ground_truth_actors)
+            z = ground_truth_sensor.tick(ground_truth_actors, ego_vehicle)
             input_adapter.handle_dedection(z, ego_vehicle)
             environemnt_plotter.save_environment(input_adapter.get_actors(), z)
             timestamp = timestamp + 1
