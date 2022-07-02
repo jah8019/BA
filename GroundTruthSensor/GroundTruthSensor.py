@@ -1,5 +1,6 @@
 from copy import copy
 import time
+import dill as pickle
 from unittest import result
 from joblib import Parallel, delayed
 
@@ -35,7 +36,7 @@ class GroundTruthSensor():
         self.z = []
         stages_array = [copy(self.stages)]
         ego_vehicle_array = [copy(ego_vehicle)]
-        result = Parallel(n_jobs=1)(delayed(check_actor_all_stages)(actor, ego_vehicle, stages) for actor in x_full for ego_vehicle in ego_vehicle_array for stages in stages_array) 
+        result = Parallel(n_jobs=2)(delayed(check_actor_all_stages)(actor, ego_vehicle, stages) for actor in x_full for ego_vehicle in ego_vehicle_array for stages in stages_array) 
         result1 = result[0]
         result2 = result[1]
         if result1 is not None and result2 is not None:

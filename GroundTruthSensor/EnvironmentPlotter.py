@@ -58,15 +58,15 @@ class Environment_plotter():
     def plot(self, ego_vehicle, test_id, sensor_id):
         id = 410 + test_id
         plt.subplot(id)
-        plt.xlabel('Longitude')
-        plt.ylabel('Latitude')
+        plt.xlabel('x')
+        plt.ylabel('y')
         plt.tight_layout() 
         for actor in self.actors:
             if ego_vehicle.type_id in actor.type_id:
                 bounding_box = ego_vehicle.bounding_box
                 self.plot_bounding_box(bounding_box)
             else: 
-                plt.plot(actor.x, actor.y, 'k', label="Ground-Truth", linewidth=0.5)
+                plt.plot(actor.x, actor.y, 'k', label="Ground Truth", linewidth=0.5)
         for sign in self.traffic_signs:
             plt.scatter(sign.x, sign.y, color='black')
         for actor in self.dedected_actors:
@@ -75,7 +75,7 @@ class Environment_plotter():
             # else:
             #    plt.plot(actor.x, actor.y, 'r', label="Sensor data", linewidth=0.5)
         for sign in self.dedected_signs:
-            plt.scatter(sign.x, sign.y, color='red')    
+            plt.scatter(sign.x, sign.y, label="Ground Truth", color='red')    
         plt.xlim([-65, 35])
         plt.ylim([-40, -80])
         plt.legend()
