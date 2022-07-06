@@ -1,3 +1,4 @@
+from cProfile import label
 import datetime
 from typing import Iterable
 import matplotlib.pyplot as plt
@@ -7,7 +8,7 @@ import carla
 class Environment_plotter():
 
     def __init__(self, object_list):
-        plt.figure(figsize=(8, 6), dpi=80)
+        plt.figure(figsize=(8, 8), dpi=80)
         self.actors = []
         self.dedected_actors = []
         self.traffic_signs = []
@@ -55,30 +56,42 @@ class Environment_plotter():
                     self.dedected_signs.append(pp.Plotpoints(object.id, location.x , location.y , object.type_id))
 
 
-    def plot(self, ego_vehicle, test_id, sensor_id):
+    def plot(self, ego_vehicle, test_id):
         id = 410 + test_id
         plt.subplot(id)
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.tight_layout() 
+        plt.tight_layout()
+        bounding_box = ego_vehicle.bounding_box
+        self.plot_bounding_box(bounding_box)
         for actor in self.actors:
-            if ego_vehicle.type_id in actor.type_id:
-                bounding_box = ego_vehicle.bounding_box
-                self.plot_bounding_box(bounding_box)
+            if ego_vehicle.id == actor.id:
+                continue
             else: 
-                plt.plot(actor.x, actor.y, 'k', label="Ground Truth", linewidth=0.5)
-        for sign in self.traffic_signs:
-            plt.scatter(sign.x, sign.y, color='black')
+                plt.plot(actor.x, actor.y, 'k', label="Ground Truth - Fahrzeug", linewidth=0.5)
+        for i in range(0, len(self.traffic_signs)):
+            sign = self.traffic_signs[i]
+            if i == 0:
+                plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='black')
+            else: 
+                plt.scatter(sign.x, sign.y, color='black')
         for actor in self.dedected_actors:
-            # if(sensor_id < 3):
-            plt.plot(actor.x, actor.y, 'r', label="Sensor data", linewidth=1)
-            # else:
-            #    plt.plot(actor.x, actor.y, 'r', label="Sensor data", linewidth=0.5)
-        for sign in self.dedected_signs:
-            plt.scatter(sign.x, sign.y, label="Ground Truth", color='red')    
+            plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
+        for i in range(0, len(self.dedected_signs)):
+            sign = self.dedected_signs[i]
+            if i == 0:
+                plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='red')    
+            else: 
+                plt.scatter(sign.x, sign.y, color='red')
         plt.xlim([-65, 35])
         plt.ylim([-40, -80])
-        plt.legend()
+        plt.legend(loc='upper right') 
+        if test_id == 1:
+            plt.title = "Überholmanöver"
+        if test_id == 2:
+            plt.title = "Abbiegen eng"
+        if test_id == 3:
+            plt.title = "Abbiegen weit"       
         self.actors = []
         self.dedected_actors = []
             
@@ -87,25 +100,25 @@ class Environment_plotter():
         elem = boundingbox.points
         next = elem[1]
         current = elem[0]
-        plt.plot([current.x, next.x], [current.y, next.y], 'r', linewidth=1)
+        plt.plot([current.x, next.x], [current.y, next.y],label="Egofahrzeug", color="blue", linewidth=1)
         current = next
         next = elem[3]
-        plt.plot([current.x, next.x], [current.y, next.y], 'r', linewidth=1)
+        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         current = next
         next = elem[2]
-        plt.plot([current.x, next.x], [current.y, next.y], 'r', linewidth=1)
+        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         current = next
         next = elem[0]
-        plt.plot([current.x, next.x], [current.y, next.y], 'r', linewidth=1)
+        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         
     def show_plot(self):
         plt.xlim([35, 65])
         plt.ylim([10, 20])
-        plt.legend()
+        plt.legend(loc='upper right')
         plt.show()
         
     def save_plot(self, test_id, sensor_id):    
-        plt.savefig("tmp" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
+        plt.savefig("plots/" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
         print("saved plot")
 
     def plot_id(self, id, location):

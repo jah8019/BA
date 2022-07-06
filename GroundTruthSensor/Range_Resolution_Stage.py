@@ -1,9 +1,11 @@
 import math
 import numpy
+import RangeResolutionPlotter as plotter
 
 class Range_Resolution_Stage:
     def __init__(self, resolution):
         self.resolution = resolution
+        self.plotter = plotter.Range_Resolution_Plotter()
 
     def check_stage(self, actor, ego_vehicle):
         distance = actor.distance
@@ -14,6 +16,7 @@ class Range_Resolution_Stage:
         location = actor.get_location()
         actor.location.x = location.x + offset
         actor.location.y = location.y + offset
+        self.plotter.save_range_resolution(distance, offset)
         return True
 
     def calculate_distance(self, actor, ego_vehicle):
@@ -28,3 +31,6 @@ class Range_Resolution_Stage:
     
     def square(self, number_to_square):
         return number_to_square * number_to_square
+
+    def plot(self, test_id, sensor_id):
+        self.plotter.plot(test_id, sensor_id)

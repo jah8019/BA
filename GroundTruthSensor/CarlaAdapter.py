@@ -16,6 +16,8 @@ class Carla_Adapter():
     def start_up(self):
         settings = self.world.get_settings()
         settings.synchronous_mode = True # Enables synchronous mode
+        #settings.fixed_delta_seconds = None
+        #settings.fixed_delta_seconds = 1/60
         settings.fixed_delta_seconds = 0.05
         self.world.apply_settings(settings)
         
