@@ -24,3 +24,8 @@ class Distance_Stage():
         else:
             return False
 
+    def plot(self, test_id, sensor_id):
+        return
+    
+    
+

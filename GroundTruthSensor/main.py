@@ -1,6 +1,5 @@
 import time
 import GroundTruthSensor as sensor
-import Parameterizing as pm
 import SpawnpointHandler as sh
 import CarlaAdapter as ca
 
@@ -9,7 +8,8 @@ ego_vehicle_id = 0
 input_adapter = ca.Carla_Adapter()
 
 for sensor_id in range(1, 5):
-    import EnvironmentPlotter as ep       
+    import EnvironmentPlotter as ep  
+    import Parameterizing as pm     
     environemnt_plotter = ep.Environment_plotter(input_adapter.get_actors())
     for test_id in range(1, 4):
 
@@ -50,7 +50,6 @@ for sensor_id in range(1, 5):
             combined_times_carla = combined_times_carla + time_elapsed_carla
             time_elapsed_result_handling = end_time_result_handling - start_time_result_handling
             combined_times_result_handling = combined_times_result_handling + time_elapsed_result_handling
-           # f.write(str(timestamp)+ ";" + str(time_elapsed) + "\n")
             if timestamp == 25*60:
                 f.write("CombinedTimes_Carla:" + str(combined_times_carla) + "\n")
                 f.write("CombinedTimes_Algo:" + str(combined_times_algo) + "\n")

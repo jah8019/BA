@@ -5,7 +5,8 @@ import RangeResolutionPlotter as plotter
 class Range_Resolution_Stage:
     def __init__(self, resolution):
         self.resolution = resolution
-        self.plotter = plotter.Range_Resolution_Plotter()
+        self.plotter = plotter.Range_Resolution_Plotter(30)
+        self.iteration = 0
 
     def check_stage(self, actor, ego_vehicle):
         distance = actor.distance

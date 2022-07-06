@@ -1,0 +1,5 @@
+Sensor_3Test_2_times
+CombinedTimes_Carla:10.931744813919067
+CombinedTimes_Algo:0.001008749008178711
+CombinedTimes_Result_Handling:5.3659820556640625
+General:20.611753463745117

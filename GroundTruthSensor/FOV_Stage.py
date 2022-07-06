@@ -56,3 +56,6 @@ class FOV_Stage():
         cy = math.cos(math.radians(rotation.yaw))
         sy = math.sin(math.radians(rotation.yaw))
         return [cy * cp, sy * cp, sp]
+
+    def plot(self, test_id, sensor_id):
+        return
