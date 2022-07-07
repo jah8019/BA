@@ -1,0 +1,10 @@
+Sensor_0Test_3_times
+CombinedTimes_Carla:9.307215213775635
+CombinedTimes_Algo:6.437301635742188e-05
+CombinedTimes_Result_Handling:9.24839973449707
+General:24.45733642578125
+Sensor_0Test_3_times
+CombinedTimes_Carla:21.54796528816223
+CombinedTimes_Algo:0.00014495849609375
+CombinedTimes_Result_Handling:15.700010299682617
+General:47.298211336135864

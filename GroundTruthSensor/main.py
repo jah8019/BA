@@ -7,7 +7,7 @@ town_name = 'Town10'
 ego_vehicle_id = 0
 input_adapter = ca.Carla_Adapter()
 
-for sensor_id in range(4, 5):
+for sensor_id in range(0, 5):
     import EnvironmentPlotter as ep  
     import Parameterizing as pm     
     environemnt_plotter = ep.Environment_plotter(input_adapter.get_actors())

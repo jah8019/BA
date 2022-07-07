@@ -75,14 +75,14 @@ class Environment_plotter():
                 plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='black')
             else: 
                 plt.scatter(sign.x, sign.y, color='black')
-        for actor in self.dedected_actors:
-            plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
-        for i in range(0, len(self.dedected_signs)):
-            sign = self.dedected_signs[i]
-            if i == 0:
-                plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
-            else: 
-                plt.scatter(sign.x, sign.y, color='red')
+        # for actor in self.dedected_actors:
+        #     plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
+        # for i in range(0, len(self.dedected_signs)):
+        #     sign = self.dedected_signs[i]
+        #     if i == 0:
+        #         plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
+        #     else: 
+        #         plt.scatter(sign.x, sign.y, color='red')
         plt.xlim([-65, 35])
         plt.ylim([-40, -80])
         plt.legend(loc='upper right') 
@@ -164,7 +164,7 @@ class Environment_plotter():
         
     def save_plot(self, test_id, sensor_id):  
         plt.legend(loc='upper right')
-        plt.savefig("plots/" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
+        plt.savefig("plots/" + "GroundTruth" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
         print("saved plot")
 
     def plot_id(self, id, location):
