@@ -8,7 +8,7 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 class Environment_plotter():
 
     def __init__(self, object_list):
-        plt.figure(figsize=(8, 6), dpi=80)
+        plt.figure(figsize=(8, 8), dpi=80)
         self.actors = []
         self.dedected_actors = []
         self.traffic_signs = []
@@ -57,8 +57,8 @@ class Environment_plotter():
 
 
     def plot(self, ego_vehicle, test_id):
-        id = 410 + test_id
-        plt.subplot(id)
+        id = 310 + test_id
+        ax = plt.subplot(id)
         plt.xlabel('x')
         plt.ylabel('y')
         plt.tight_layout()
@@ -85,15 +85,37 @@ class Environment_plotter():
                 plt.scatter(sign.x, sign.y, color='red')
         plt.xlim([-65, 35])
         plt.ylim([-40, -80])
-        plt.legend(loc='upper right') 
+        plt.legend(ncol=2, loc=4) 
         if test_id == 1:
-            plt.title = "Überholmanöver"
+            ax.title.set_text("Überholmanöver")
         if test_id == 2:
-            plt.title = "Abbiegen eng"
+            ax.title.set_text("Abbiegen eng")
         if test_id == 3:
-            plt.title = "Abbiegen weit"       
+            ax.title.set_text("Abbiegen weit")
         self.actors = []
+        self.traffic_signs = []
         self.dedected_actors = []
+        self.dedected_signs = []
+            
+    def plot_bounding_box(self, boundingbox, plotter):
+        elem = boundingbox.points
+        next = elem[1]
+        current = elem[0]
+        plotter.plot([current.x, next.x], [current.y, next.y],label="Egofahrzeug", color="blue", linewidth=1)
+        current = next
+        next = elem[3]
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        current = next
+        next = elem[2]
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        current = next
+        next = elem[0]
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        
+    def save_plot(self, test_id, sensor_id):  
+        plt.savefig("plots/" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
+        print("saved plot")
+
 
     def plot_zoomed(self, ego_vehicle, test_id):
         id = 410 + test_id
@@ -101,7 +123,7 @@ class Environment_plotter():
         plt.xlabel('x')
         plt.ylabel('y')
         plt.tight_layout()
-        plt.xlim([-65, 35])
+        plt.xlim([-65, 50])
         plt.ylim([-40, -80])
         plt.grid(True)
         if test_id == 1:
@@ -140,32 +162,3 @@ class Environment_plotter():
         axis.grid(True)
         self.actors = []
         self.dedected_actors = []
-            
-    def plot_bounding_box(self, boundingbox, plotter):
-        elem = boundingbox.points
-        next = elem[1]
-        current = elem[0]
-        plotter.plot([current.x, next.x], [current.y, next.y],label="Egofahrzeug", color="blue", linewidth=1)
-        current = next
-        next = elem[3]
-        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
-        current = next
-        next = elem[2]
-        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
-        current = next
-        next = elem[0]
-        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
-        
-    def show_plot(self):
-        plt.xlim([35, 65])
-        plt.ylim([10, 20])
-        plt.legend(loc='upper right')
-        plt.show()
-        
-    def save_plot(self, test_id, sensor_id):  
-        plt.legend(loc='upper right')
-        plt.savefig("plots/" + "GroundTruth" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
-        print("saved plot")
-
-    def plot_id(self, id, location):
-        plt.text(location.x, location.y, str(id), color="red", fontsize=12)
