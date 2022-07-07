@@ -7,7 +7,7 @@ town_name = 'Town10'
 ego_vehicle_id = 0
 input_adapter = ca.Carla_Adapter()
 
-for sensor_id in range(1, 5):
+for sensor_id in range(4, 5):
     import EnvironmentPlotter as ep  
     import Parameterizing as pm     
     environemnt_plotter = ep.Environment_plotter(input_adapter.get_actors())
@@ -56,6 +56,9 @@ for sensor_id in range(1, 5):
                 f.write("CombinedTimes_Result_Handling:" + str(combined_times_result_handling) + "\n")
                 f.write("General:" + str(time.time() - global_start_time) + "\n")
                 f.close()
+                #if sensor_id >= 4:
+                #    environemnt_plotter.plot_zoomed(ego_vehicle, test_id)
+                #else:    
                 environemnt_plotter.plot(ego_vehicle, test_id)
                 break
         input_adapter.clean_up(actors)

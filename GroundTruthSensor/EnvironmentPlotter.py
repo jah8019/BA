@@ -1,9 +1,9 @@
-from cProfile import label
 import datetime
 from typing import Iterable
 import matplotlib.pyplot as plt
 import Plotpoints as pp
 import carla
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 
 class Environment_plotter():
 
@@ -63,7 +63,7 @@ class Environment_plotter():
         plt.ylabel('y')
         plt.tight_layout()
         bounding_box = ego_vehicle.bounding_box
-        self.plot_bounding_box(bounding_box)
+        self.plot_bounding_box(bounding_box, plt)
         for actor in self.actors:
             if ego_vehicle.id == actor.id:
                 continue
@@ -80,7 +80,7 @@ class Environment_plotter():
         for i in range(0, len(self.dedected_signs)):
             sign = self.dedected_signs[i]
             if i == 0:
-                plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='red')    
+                plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
             else: 
                 plt.scatter(sign.x, sign.y, color='red')
         plt.xlim([-65, 35])
@@ -94,22 +94,67 @@ class Environment_plotter():
             plt.title = "Abbiegen weit"       
         self.actors = []
         self.dedected_actors = []
-            
-    def plot_bounding_box(self, boundingbox):
 
+    def plot_zoomed(self, ego_vehicle, test_id):
+        id = 410 + test_id
+        ax = plt.subplot(id)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.tight_layout()
+        plt.xlim([-65, 35])
+        plt.ylim([-40, -80])
+        plt.grid(True)
+        if test_id == 1:
+            plt.title = "Überholmanöver"
+        if test_id == 2:
+            plt.title = "Abbiegen eng"
+        if test_id == 3:
+            plt.title = "Abbiegen weit" 
+        bounding_box = ego_vehicle.bounding_box
+        self.plot_bounding_box(bounding_box, plt)
+        for actor in self.actors:
+            if ego_vehicle.id == actor.id:
+                continue
+            else: 
+                plt.plot(actor.x, actor.y, 'k', label="Ground Truth - Fahrzeug", linewidth=0.5)
+        for i in range(0, len(self.traffic_signs)):
+            sign = self.traffic_signs[i]
+            if i == 0:
+                plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='black')
+            else: 
+                plt.scatter(sign.x, sign.y, color='black')
+        for actor in self.dedected_actors:
+            plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
+        for i in range(0, len(self.dedected_signs)):
+            sign = self.dedected_signs[i]
+            if i == 0:
+                plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
+            else: 
+                plt.scatter(sign.x, sign.y, color='red')   
+        axis = zoomed_inset_axes(ax, 7, loc=2)
+        for actor in self.dedected_actors:
+            third = int(len(actor.x)/3)
+            third_x = actor.x[:third]
+            third_y = actor.y[:third]
+            axis.plot(third_x, third_y)
+        axis.grid(True)
+        self.actors = []
+        self.dedected_actors = []
+            
+    def plot_bounding_box(self, boundingbox, plotter):
         elem = boundingbox.points
         next = elem[1]
         current = elem[0]
-        plt.plot([current.x, next.x], [current.y, next.y],label="Egofahrzeug", color="blue", linewidth=1)
+        plotter.plot([current.x, next.x], [current.y, next.y],label="Egofahrzeug", color="blue", linewidth=1)
         current = next
         next = elem[3]
-        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         current = next
         next = elem[2]
-        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         current = next
         next = elem[0]
-        plt.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
+        plotter.plot([current.x, next.x], [current.y, next.y], color="blue", linewidth=1)
         
     def show_plot(self):
         plt.xlim([35, 65])
@@ -117,7 +162,8 @@ class Environment_plotter():
         plt.legend(loc='upper right')
         plt.show()
         
-    def save_plot(self, test_id, sensor_id):    
+    def save_plot(self, test_id, sensor_id):  
+        plt.legend(loc='upper right')
         plt.savefig("plots/" + str(test_id) + str(sensor_id) + "_Ground_Truth.svg", format="svg",transparent=True)
         print("saved plot")
 

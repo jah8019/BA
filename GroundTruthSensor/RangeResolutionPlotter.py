@@ -18,10 +18,11 @@ class Range_Resolution_Plotter:
 
     def plot(self, test_id, sensor_id):
         plt.figure(figsize=(8, 8), dpi=80)
-        plt.xlabel('Abstand')
-        plt.ylabel('Rauschen')
+        plt.xlabel('Abstand [m]')
+        plt.ylabel('Rauschen [m]')
         plt.title = "Winkelauflösung"       
         plt.plot(self.distance, self.noise, color="black", linewidth=1)
+        plt.grid(True)
         plt.savefig("plots/range_resolution/" + str(test_id) + str(sensor_id) + "_Range_Resolution.svg", format="svg",transparent=True)
         print("saved plot")
         self.distance = []
