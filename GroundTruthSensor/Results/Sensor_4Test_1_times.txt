@@ -28,3 +28,8 @@ CombinedTimes_Carla:12.422541618347168
 CombinedTimes_Algo:0.0005075931549072266
 CombinedTimes_Result_Handling:2.288693904876709
 General:17.669021606445312
+Sensor_4Test_1_times
+CombinedTimes_Carla:18.328985929489136
+CombinedTimes_Algo:0.0018684864044189453
+CombinedTimes_Result_Handling:6.579941987991333
+General:33.598593950271606

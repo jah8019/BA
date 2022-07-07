@@ -8,7 +8,7 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 class Environment_plotter():
 
     def __init__(self, object_list):
-        plt.figure(figsize=(8, 8), dpi=80)
+        plt.figure(figsize=(8, 6), dpi=80)
         self.actors = []
         self.dedected_actors = []
         self.traffic_signs = []
@@ -75,14 +75,14 @@ class Environment_plotter():
                 plt.scatter(sign.x, sign.y, label="Ground Truth - Ampel", color='black')
             else: 
                 plt.scatter(sign.x, sign.y, color='black')
-        # for actor in self.dedected_actors:
-        #     plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
-        # for i in range(0, len(self.dedected_signs)):
-        #     sign = self.dedected_signs[i]
-        #     if i == 0:
-        #         plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
-        #     else: 
-        #         plt.scatter(sign.x, sign.y, color='red')
+        for actor in self.dedected_actors:
+            plt.plot(actor.x, actor.y, 'r', label="Sensordaten - Fahrzeug", linewidth=1)
+        for i in range(0, len(self.dedected_signs)):
+            sign = self.dedected_signs[i]
+            if i == 0:
+                plt.scatter(sign.x, sign.y, label="Sensordaten - Ampel", color='red')    
+            else: 
+                plt.scatter(sign.x, sign.y, color='red')
         plt.xlim([-65, 35])
         plt.ylim([-40, -80])
         plt.legend(loc='upper right') 
